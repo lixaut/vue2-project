@@ -3,6 +3,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,
   devServer: {
-    host: 'local-ip'
+    host: 'localhost',
+    port: 8080,
   }
 })
