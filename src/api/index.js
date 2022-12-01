@@ -6,3 +6,8 @@ export const login = data => request({
   method: 'post',
   data
 })
+
+export const reqGetMenu = () => request({
+  url: 'menus',
+  method: 'get'
+})

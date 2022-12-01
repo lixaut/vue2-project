@@ -1,0 +1,44 @@
+{
+  "id": "3803275",
+  "name": "vue2-project",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "23257736",
+      "name": "风险",
+      "font_class": "quanxian",
+      "unicode": "f891",
+      "unicode_decimal": 63633
+    },
+    {
+      "icon_id": "23257742",
+      "name": "团队",
+      "font_class": "yonghu",
+      "unicode": "f897",
+      "unicode_decimal": 63639
+    },
+    {
+      "icon_id": "23257746",
+      "name": "教学",
+      "font_class": "shuju",
+      "unicode": "f89b",
+      "unicode_decimal": 63643
+    },
+    {
+      "icon_id": "23257755",
+      "name": "任务",
+      "font_class": "dingdan",
+      "unicode": "f8a3",
+      "unicode_decimal": 63651
+    },
+    {
+      "icon_id": "23257770",
+      "name": "购物",
+      "font_class": "shangpin",
+      "unicode": "f8b2",
+      "unicode_decimal": 63666
+    }
+  ]
+}

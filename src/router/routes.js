@@ -11,7 +11,14 @@ export default {
     },
     {
       path: '/home',
-      component: () => import('@/pages/Home.vue')
+      component: () => import('@/pages/Home.vue'),
+      children: [
+        {
+          path: 'welcome',
+          component: () => import('@/components/Welcome.vue')
+        }
+      ],
+      redirect: '/home/welcome'
     }
   ]
 }

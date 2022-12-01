@@ -5,6 +5,8 @@ import 'element-ui/lib/theme-chalk/index.css'
 import router from '@/router'
 // 导入全局样式表
 import '@/assets/css/global.css'
+// 引入字体 icon 图标
+import '@/assets/font/iconfont.css'
 // 导入 api
 import * as requests from '@/api'
 
