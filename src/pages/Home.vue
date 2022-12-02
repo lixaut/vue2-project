@@ -1,5 +1,6 @@
 <template>
   <el-container>
+
     <!-- 头部区域 -->
     <el-header>
       <div class="header-info">
@@ -12,8 +13,10 @@
       </div>
       <el-button type="info" @click="logout">退出</el-button>
     </el-header>
+
     <!-- 页面主体 -->
     <el-container>
+      
       <!-- 侧边栏 -->
       <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-btn" @click="toggleAside">
@@ -27,6 +30,8 @@
           :unique-opened="true"
           :collapse="isCollapse"
           :collapse-transition="false"
+          router
+          :default-active="$route.path"
         >
           <el-submenu
             :index="item1.order + ''"
@@ -38,7 +43,7 @@
               <span>{{ item1.authName }}</span>
             </template>
             <el-menu-item
-              :index="item2.id"
+              :index="'/home/' + item2.path"
               v-for="item2 in item1.children"
               :key="item2.id"
             >
@@ -50,6 +55,7 @@
           </el-submenu>
         </el-menu>
       </el-aside>
+
       <!-- 右侧内容 -->
       <el-main>
         <router-view></router-view>
@@ -71,7 +77,7 @@ export default {
         102: "iconfont icon-dingdan",
         145: "iconfont icon-shuju",
       },
-      isCollapse: true
+      isCollapse: false
     };
   },
   created() {

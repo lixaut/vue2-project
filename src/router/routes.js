@@ -16,6 +16,10 @@ export default {
         {
           path: 'welcome',
           component: () => import('@/components/Welcome.vue')
+        },
+        {
+          path: 'users',
+          component: () => import('@/components/User.vue')
         }
       ],
       redirect: '/home/welcome'

@@ -11,3 +11,9 @@ export const reqGetMenu = () => request({
   url: 'menus',
   method: 'get'
 })
+
+export const reqGetUserList = (params) => request({
+  url: 'users',
+  method: 'get',
+  params
+})
