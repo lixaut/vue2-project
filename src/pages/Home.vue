@@ -3,7 +3,7 @@
 
     <!-- 头部区域 -->
     <el-header>
-      <div class="header-info">
+      <div class="header-info" @click="goHome">
         <img
           class="brand-logo"
           src="@/assets/logo.jpg"
@@ -93,8 +93,13 @@ export default {
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg);
       this.menuList = res.data;
     },
+    // 显示/隐藏侧边栏
     toggleAside() {
       this.isCollapse = !this.isCollapse
+    },
+    // 图标导航
+    goHome() {
+      this.$router.push('/home')
     }
   },
 };
@@ -117,6 +122,8 @@ export default {
       color: #fff;
       .platform-name {
         padding-left: 20px;
+        letter-spacing: 2px;
+        user-select: none;
       }
       .brand-logo {
         height: 60px;

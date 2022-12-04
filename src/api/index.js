@@ -55,3 +55,15 @@ export const reqDeleteUser = id => request({
   url: `users/${id}`,
   method: 'delete'
 })
+
+// 所有权限列表
+export const reqGetRightsList = type => request({
+  url: `rights/${type}`,
+  method: 'get'
+})
+
+// 角色列表
+export const reqGetRolesList = () => request({
+  url: 'roles',
+  method: 'get'
+})

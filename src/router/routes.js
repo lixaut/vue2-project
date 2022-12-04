@@ -19,7 +19,15 @@ export default {
         },
         {
           path: 'users',
-          component: () => import('@/components/User.vue')
+          component: () => import('@/components/user/User.vue')
+        },
+        {
+          path: 'rights',
+          component: () => import('@/components/rights/Rights.vue')
+        },
+        {
+          path: 'roles',
+          component: () => import('@/components/rights/Roles.vue')
         }
       ],
       redirect: '/home/welcome'
