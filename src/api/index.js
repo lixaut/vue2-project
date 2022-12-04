@@ -39,3 +39,19 @@ export const reqAddUser = data => request({
   method: 'post',
   data
 })
+
+// 修改用户
+export const reqEditUser = data => {
+  const { id } = data
+  return request({
+    url: `users/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+// 删除单个用户
+export const reqDeleteUser = id => request({
+  url: `users/${id}`,
+  method: 'delete'
+})
