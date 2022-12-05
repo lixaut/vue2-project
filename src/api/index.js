@@ -67,3 +67,18 @@ export const reqGetRolesList = () => request({
   url: 'roles',
   method: 'get'
 })
+
+// 删除角色指定权限
+export const reqDeleteRightById = (roleId, rightId) => request({
+  url: `roles/${roleId}/rights/${rightId}`,
+  method: 'delete'
+})
+
+// 角色授权
+export const reqRoleAuth = (roleId, rids) => request({
+  url: `roles/${roleId}/rights`,
+  method: 'post',
+  data: {
+    rids
+  }
+})
