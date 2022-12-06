@@ -190,7 +190,7 @@ export default {
     async deleteRightById(roleInfo, rightId) {
       const delResult = await this.$msgbox({
         title: "提示",
-        message: "此操作将永远删除该权限，确认要继续吗？",
+        message: "此操作将永久删除该权限，确认要继续吗？",
         type: "warning",
         showClose: false,
         showCancelButton: true,

@@ -82,3 +82,12 @@ export const reqRoleAuth = (roleId, rids) => request({
     rids
   }
 })
+
+// 分配用户角色
+export const reqSetUserRole = ({ userId, roleId }) => request({
+  url: `users/${userId}/role`,
+  method: 'put',
+  data: {
+    rid: roleId
+  }
+})
