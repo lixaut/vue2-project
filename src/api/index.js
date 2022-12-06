@@ -98,3 +98,25 @@ export const reqAddRole = roleInfo => request({
   method: 'post',
   data: roleInfo
 })
+
+// 根据ID查询角色
+export const reqSearchRoleById = id => request({
+  url: `roles/${id}`,
+  method: 'get'
+})
+
+// 编辑角色
+export const reqEditRole = ({ roleId, roleName, roleDesc }) => request({
+  url: `roles/${roleId}`,
+  method: 'put',
+  data: {
+    roleName,
+    roleDesc
+  }
+})
+
+// 删除角色
+export const reqDeleteRole = roleId => request({
+  url: `roles/${roleId}`,
+  method: 'delete'
+})
