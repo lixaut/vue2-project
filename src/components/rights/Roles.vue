@@ -96,7 +96,11 @@
     </el-card>
 
     <!-- 分配权限对话框 -->
-    <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%">
+    <el-dialog
+      title="分配权限"
+      :visible.sync="setRightDialogVisible"
+      width="50%"
+    >
       <el-tree
         :data="rightsList"
         show-checkbox
@@ -127,12 +131,12 @@ export default {
       rightsList: [],
       rightsProps: {
         label: "authName",
-        children: 'children'
+        children: "children",
       },
       // 默认选中的节点ID
       defaultKeys: [],
       // 当前分配权限角色id
-      roleId: ''
+      roleId: "",
     };
   },
   created() {
@@ -150,37 +154,61 @@ export default {
     // 收集默认选中节点列表id
     getDefaultKeys(node, arr) {
       if (!node.children) {
-        return arr.push(node.id)
+        return arr.push(node.id);
       }
-      node.children.forEach(item => {
-        this.getDefaultKeys(item, arr)
-      })
-      return arr
+      node.children.forEach((item) => {
+        this.getDefaultKeys(item, arr);
+      });
+      return arr;
     },
     // 分配权限对话框按钮
     async setRightDialog(roleInfo) {
-      this.roleId = roleInfo.id
+      this.roleId = roleInfo.id;
       const { data: res } = await this.$http.reqGetRightsList(this.type);
       if (res.meta.status !== 200) {
         return this.$message.error("获取权限列表失败！");
       }
       this.rightsList = res.data;
-      this.defaultKeys = this.getDefaultKeys(roleInfo, [])
+      this.defaultKeys = this.getDefaultKeys(roleInfo, []);
       this.setRightDialogVisible = true;
     },
     // 提交分配好的权限
     async setRightDialogConfirm() {
-      const rightKeys = this.$refs.treeRef.getCheckedKeys()
-        .concat(this.$refs.treeRef.getHalfCheckedKeys())
-      let rids = rightKeys.join(',')
-      const { data: res } = await this.$http.reqRoleAuth(this.roleId, rids)
+      const rightKeys = this.$refs.treeRef
+        .getCheckedKeys()
+        .concat(this.$refs.treeRef.getHalfCheckedKeys());
+      let rids = rightKeys.join(",");
+      const { data: res } = await this.$http.reqRoleAuth(this.roleId, rids);
       if (res.meta.status !== 200) {
-        return this.$message.error('权限分配失败！')
+        return this.$message.error("权限分配失败！");
       }
-      this.$message.success('权限分配成功！')
-      this.setRightDialogVisible = false
-      this.getRolesList()
-    }
+      this.$message.success("权限分配成功！");
+      this.setRightDialogVisible = false;
+      this.getRolesList();
+    },
+    // 删除角色指定权限
+    async deleteRightById(roleInfo, rightId) {
+      const delResult = await this.$msgbox({
+        title: "提示",
+        message: "此操作将永远删除该权限，确认要继续吗？",
+        type: "warning",
+        showClose: false,
+        showCancelButton: true,
+        showConfirmButton: true,
+      }).catch((error) => new Error(error));
+      if (delResult === "confirm") {
+        const { data: res } = await this.$http.reqDeleteRightById(
+          roleInfo.id,
+          rightId
+        );
+        if (res.meta.status !== 200) {
+          return this.$message.error("权限删除失败！");
+        }
+        roleInfo.children = res.data;
+        return this.$message.success("权限删除成功！")
+      }
+      this.$message.info("权限删除已取消！");
+    },
   },
 };
 </script>
