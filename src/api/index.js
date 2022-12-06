@@ -91,3 +91,10 @@ export const reqSetUserRole = ({ userId, roleId }) => request({
     rid: roleId
   }
 })
+
+// 添加角色
+export const reqAddRole = roleInfo => request({
+  url: 'roles',
+  method: 'post',
+  data: roleInfo
+})

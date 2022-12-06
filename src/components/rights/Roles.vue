@@ -12,7 +12,7 @@
       <!-- 头部功能区域 -->
       <el-row>
         <el-col>
-          <el-button type="primary">添加角色</el-button>
+          <el-button type="primary" @click="addRoleBtn">添加角色</el-button>
         </el-col>
       </el-row>
 
@@ -117,6 +117,31 @@
         >
       </div>
     </el-dialog>
+
+    <!-- 添加角色对话框 -->
+    <el-dialog
+      title="添加角色"
+      :visible.sync="addRoleDialogVisible"
+      @close="addRoleDialogClosed"
+    >
+      <el-form
+        ref="addRoleFormRef"
+        :model="addRoleInfo"
+        label-width="80px"
+        :rules="roleRules"
+      >
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="addRoleInfo.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="addRoleInfo.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="addRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addRoleSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -124,6 +149,17 @@
 export default {
   name: "Roles",
   data() {
+    // 自定义用户角色校验规则
+    var checkRoleName = (rule, value, callback) => {
+      setTimeout(() => {
+        const roleArr = this.rolesList.map((item) => item.roleName);
+        let roleIsHave = roleArr.includes(value);
+        if (roleIsHave) {
+          return callback(new Error("该角色名已被占用"));
+        }
+        callback()
+      });
+    };
     return {
       rolesList: [],
       setRightDialogVisible: false,
@@ -137,6 +173,21 @@ export default {
       defaultKeys: [],
       // 当前分配权限角色id
       roleId: "",
+      addRoleInfo: {
+        roleName: "",
+        roleDesc: "",
+      },
+      addRoleDialogVisible: false,
+      // 角色规则
+      roleRules: {
+        roleName: [
+          { required: true, message: "请输入角色名称", trigger: "blur" },
+          { validator: checkRoleName, trigger: "blur" },
+        ],
+        roleDesc: [
+          { required: true, message: "请输入角色描述", trigger: "blur" },
+        ],
+      },
     };
   },
   created() {
@@ -205,10 +256,31 @@ export default {
           return this.$message.error("权限删除失败！");
         }
         roleInfo.children = res.data;
-        return this.$message.success("权限删除成功！")
+        return this.$message.success("权限删除成功！");
       }
       this.$message.info("权限删除已取消！");
     },
+    // 添加角色按钮
+    addRoleBtn() {
+      this.addRoleDialogVisible = true;
+    },
+    // 添加角色提交
+    addRoleSubmit() {
+      this.$refs.addRoleFormRef.validate(async (valid) => {
+        if (!valid) return
+        const { data: res } = await this.$http.reqAddRole(this.addRoleInfo)
+        if (res.meta.status !== 201) {
+          return this.$message.error('添加角色失败！')
+        }
+        this.$message.success('添加角色成功！')
+        this.getRolesList()
+        this.addRoleDialogVisible = false;
+      })
+    },
+    // 添加角色对话框关闭
+    addRoleDialogClosed() {
+      this.$refs.addRoleFormRef.resetFields()
+    }
   },
 };
 </script>
