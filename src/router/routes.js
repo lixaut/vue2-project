@@ -28,6 +28,10 @@ export default {
         {
           path: 'roles',
           component: () => import('@/components/rights/Roles.vue')
+        },
+        {
+          path: 'categories',
+          component: () => import('@/components/goods/Cate.vue')
         }
       ],
       redirect: '/home/welcome'

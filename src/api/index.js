@@ -120,3 +120,10 @@ export const reqDeleteRole = roleId => request({
   url: `roles/${roleId}`,
   method: 'delete'
 })
+
+// 商品分类数据列表
+export const reqGetGoodsCate = params => request({
+  url: 'categories',
+  method: 'get',
+  params
+})
