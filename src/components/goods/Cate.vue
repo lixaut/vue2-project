@@ -12,7 +12,7 @@
       <!-- 顶部功能区 -->
       <el-row>
         <el-col>
-          <el-button type="primary">添加分类</el-button>
+          <el-button type="primary" @click="addCateBtn">添加分类</el-button>
         </el-col>
       </el-row>
 
@@ -69,6 +69,43 @@
         :total="total"
       >
       </el-pagination>
+
+      <!-- 添加分类对话框 -->
+      <el-dialog
+        title="添加分类"
+        :visible.sync="addCateDialogVisible"
+        @close="addCateDialogClosed"
+      >
+        <!-- 添加分类表单 -->
+        <el-form
+          :model="addCateInfo"
+          label-width="80px"
+          :rules="addCateRules"
+          status-icon
+          ref="addCateFormRef"
+        >
+          <el-form-item label="分类名称" prop="cat_name">
+            <el-input v-model="addCateInfo.cat_name"></el-input>
+          </el-form-item>
+          <el-form-item label="父级分类">
+            <el-cascader
+              v-model="selectedKeys"
+              :options="parentCateList"
+              :props="cascaderProps"
+              @change="cascaderChanged"
+            >
+            </el-cascader>
+          </el-form-item>
+        </el-form>
+
+        <!-- 底部按钮 -->
+        <div slot="footer">
+          <el-button @click="addCateDialogVisible = false">取 消</el-button>
+          <el-button @click="addCateDialogSubmit" type="primary"
+            >确 定</el-button
+          >
+        </div>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -86,6 +123,29 @@ export default {
         pagenum: 1,
         pagesize: 5,
       },
+      addCateDialogVisible: false,
+      addCateInfo: {
+        cat_pid: 0,
+        cat_name: "",
+        cat_level: 0,
+      },
+      // 添加分类验证规则
+      addCateRules: {
+        cat_name: [
+          { required: true, message: "请输入分类名称", trigger: "blur" },
+        ],
+      },
+      // 父级分类列表
+      parentCateList: [],
+      cascaderProps: {
+        label: "cat_name",
+        value: "cat_id",
+        children: "children",
+        expandTrigger: "hover",
+        checkStrictly: true,
+      },
+      // 层级选择其选中的keys
+      selectedKeys: [],
     };
   },
   created() {
@@ -102,14 +162,57 @@ export default {
     },
     // pagesize 改变回调
     handleSizeChange(newPagesize) {
-      this.queryInfo.pagesize = newPagesize
-      this.getCateList()
+      this.queryInfo.pagesize = newPagesize;
+      this.getCateList();
     },
     // 当前页改变回调
     handleCurrentChange(newPagenum) {
-      this.queryInfo.pagenum = newPagenum
-      this.getCateList()
-    }
+      this.queryInfo.pagenum = newPagenum;
+      this.getCateList();
+    },
+    // 添加分类对话框提交按钮
+    addCateDialogSubmit() {
+      this.$refs.addCateFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.reqAddCate(this.addCateInfo)
+        if (res.meta.status !== 201) {
+          this.$message.error('添加分类失败！')
+        }
+        this.$message.success('添加分类成功！')
+        this.getCateList()
+        this.addCateDialogVisible = false;
+      }) 
+    },
+    // 添加分类按钮
+    addCateBtn() {
+      this.getParentCateList();
+      this.addCateDialogVisible = true;
+    },
+    // 获取父级分类列表
+    async getParentCateList() {
+      const { data: res } = await this.$http.reqGetGoodsCate({ type: 2 });
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取父级列表失败！");
+      }
+      this.parentCateList = res.data;
+    },
+    // 层级选择器发生变化
+    cascaderChanged() {
+      if (this.selectedKeys.length > 0) {
+        this.addCateInfo.cat_pid = this.selectedKeys[this.selectedKeys.length - 1]
+        this.addCateInfo.cat_level = this.selectedKeys.length
+      } else {
+        this.addCateInfo.cat_pid = 0
+        this.addCateInfo.cat_level = 0
+      }
+    },
+    // 添加分类对话框关闭回调
+    addCateDialogClosed() {
+      this.selectedKeys = [];
+      this.$refs.addCateFormRef.resetFields()
+      this.addCateInfo.cat_pid = 0
+      this.addCateInfo.cat_level = 0
+    },
   },
 };
 </script>
@@ -123,5 +226,8 @@ export default {
 }
 .el-table {
   margin: 20px 0;
+}
+.el-cascader {
+  width: 100%;
 }
 </style>

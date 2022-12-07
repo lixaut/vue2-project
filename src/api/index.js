@@ -127,3 +127,10 @@ export const reqGetGoodsCate = params => request({
   method: 'get',
   params
 })
+
+// 添加分类
+export const reqAddCate = data => request({
+  url: 'categories',
+  method: 'post',
+  data
+})
