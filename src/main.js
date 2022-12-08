@@ -3,6 +3,8 @@ import App from './App.vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import router from '@/router'
+// 导入进度条样式
+import 'nprogress/nprogress.css'
 // 导入全局样式表
 import '@/assets/css/global.css'
 // 引入字体 icon 图标
