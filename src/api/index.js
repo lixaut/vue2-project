@@ -134,3 +134,18 @@ export const reqAddCate = data => request({
   method: 'post',
   data
 })
+
+// 编辑提交分类
+export const reqEditCate = ({cat_id, cat_name}) => request({
+  url: `categories/${cat_id}`,
+  method: 'put',
+  data: {
+    cat_name
+  }
+})
+
+// 删除分类
+export const reqDeleteCate = cateId => request({
+  url: `categories/${cateId}`,
+  method: 'delete'
+})

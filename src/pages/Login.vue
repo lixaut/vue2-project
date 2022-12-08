@@ -20,6 +20,7 @@
             show-password
             prefix-icon="el-icon-lock"
             v-model="loginForm.password"
+            @change="passwordChanged()"
           ></el-input>
         </el-form-item>
         <el-form-item class="btns">
@@ -76,7 +77,7 @@ export default {
         if (!valid) return;
         try {
           const { data: res } = await this.$http.login(this.loginForm);
-          if (res.meta.status !== 200) return this.$message.error("登录失败!");
+          if (res.meta.status !== 200) return this.$message.error("用户名或密码错误!");
           this.$message({
             message: "登录成功!",
             type: "success",
@@ -89,6 +90,10 @@ export default {
         }
       });
     },
+    // 密码输入框改变时触发
+    passwordChanged() {
+      this.login()
+    }
   },
 };
 </script>

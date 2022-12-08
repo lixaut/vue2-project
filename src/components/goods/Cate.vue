@@ -47,11 +47,19 @@
           </template>
         </el-table-column>
         <el-table-column width="200px" align="center" label="操作">
-          <template>
-            <el-button size="mini" type="success" icon="el-icon-edit"
+          <template slot-scope="{ row }">
+            <el-button
+              size="mini"
+              type="success"
+              icon="el-icon-edit"
+              @click="editCateBtn(row)"
               >编辑</el-button
             >
-            <el-button size="mini" type="danger" icon="el-icon-delete"
+            <el-button
+              size="mini"
+              type="danger"
+              icon="el-icon-delete"
+              @click="deleteCateBtn(row)"
               >删除</el-button
             >
           </template>
@@ -106,6 +114,33 @@
           >
         </div>
       </el-dialog>
+
+      <!-- 编辑分类对话框 -->
+      <el-dialog
+        title="编辑分类"
+        :visible.sync="eidtCateDialogVisible"
+        @close="editCateDialogClosed"
+      >
+        <!-- 编辑分类表单 -->
+        <el-form
+          label-width="80px"
+          :rules="addCateRules"
+          ref="editCateFormRef"
+          :model="editCateInfo"
+        >
+          <el-form-item label="分类名称" prop="cat_name">
+            <el-input
+              ref="editCateInputRef"
+              v-model="editCateInfo.cat_name"
+              clearable
+            ></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer">
+          <el-button @click="eidtCateDialogVisible = false">取 消</el-button>
+          <el-button @click="editDialogSubmit" type="primary">确 定</el-button>
+        </div>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -124,6 +159,7 @@ export default {
         pagesize: 5,
       },
       addCateDialogVisible: false,
+      eidtCateDialogVisible: false,
       addCateInfo: {
         cat_pid: 0,
         cat_name: "",
@@ -146,6 +182,8 @@ export default {
       },
       // 层级选择其选中的keys
       selectedKeys: [],
+      // 编辑分类信息
+      editCateInfo: {},
     };
   },
   created() {
@@ -172,16 +210,16 @@ export default {
     },
     // 添加分类对话框提交按钮
     addCateDialogSubmit() {
-      this.$refs.addCateFormRef.validate(async valid => {
-        if (!valid) return
-        const { data: res } = await this.$http.reqAddCate(this.addCateInfo)
+      this.$refs.addCateFormRef.validate(async (valid) => {
+        if (!valid) return;
+        const { data: res } = await this.$http.reqAddCate(this.addCateInfo);
         if (res.meta.status !== 201) {
-          this.$message.error('添加分类失败！')
+          this.$message.error("添加分类失败！");
         }
-        this.$message.success('添加分类成功！')
-        this.getCateList()
+        this.$message.success("添加分类成功！");
+        this.getCateList();
         this.addCateDialogVisible = false;
-      }) 
+      });
     },
     // 添加分类按钮
     addCateBtn() {
@@ -199,19 +237,62 @@ export default {
     // 层级选择器发生变化
     cascaderChanged() {
       if (this.selectedKeys.length > 0) {
-        this.addCateInfo.cat_pid = this.selectedKeys[this.selectedKeys.length - 1]
-        this.addCateInfo.cat_level = this.selectedKeys.length
+        this.addCateInfo.cat_pid =
+          this.selectedKeys[this.selectedKeys.length - 1];
+        this.addCateInfo.cat_level = this.selectedKeys.length;
       } else {
-        this.addCateInfo.cat_pid = 0
-        this.addCateInfo.cat_level = 0
+        this.addCateInfo.cat_pid = 0;
+        this.addCateInfo.cat_level = 0;
       }
     },
     // 添加分类对话框关闭回调
     addCateDialogClosed() {
       this.selectedKeys = [];
-      this.$refs.addCateFormRef.resetFields()
-      this.addCateInfo.cat_pid = 0
-      this.addCateInfo.cat_level = 0
+      this.$refs.addCateFormRef.resetFields();
+      this.addCateInfo.cat_pid = 0;
+      this.addCateInfo.cat_level = 0;
+    },
+    // 编辑分类对话框提交按钮
+    editDialogSubmit() {
+      this.$refs.editCateFormRef.validate(async (valid) => {
+        if (!valid) return;
+        const { data: res } = await this.$http.reqEditCate(this.editCateInfo);
+        if (res.meta.status !== 200) {
+          return this.$message.error("编辑分类失败！");
+        }
+        this.$message.success("编辑分类成功！");
+        this.getCateList();
+        this.eidtCateDialogVisible = false;
+      });
+    },
+    // 编辑分类对话框关闭
+    editCateDialogClosed() {
+      this.$refs.editCateFormRef.resetFields();
+    },
+    // 编辑分类按钮
+    editCateBtn(cateInfo) {
+      const { cat_id, cat_name } = cateInfo;
+      this.editCateInfo = { cat_id, cat_name };
+      this.eidtCateDialogVisible = true;
+    },
+    // 删除分类按钮
+    async deleteCateBtn(cateInfo) {
+      const deleteCateResult = await this.$msgbox({
+        title: '提示',
+        message: '此操作将永久删除该分类，确定要继续吗？',
+        type: 'warning',
+        showCancelButton: true,
+        showConfirmButton: true,
+      }).catch(error => new Error(error))
+      if (deleteCateResult === 'confirm') {
+        const { data: res } = await this.$http.reqDeleteCate(cateInfo.cat_id)
+        if (res.meta.status !== 200) {
+          return this.$message.error('删除分类失败！')
+        }
+        this.getCateList()
+        return this.$message.success('删除分类成功！')
+      }
+      this.$message.info('删除分类已取消！')
     },
   },
 };
