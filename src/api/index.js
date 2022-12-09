@@ -149,3 +149,12 @@ export const reqDeleteCate = cateId => request({
   url: `categories/${cateId}`,
   method: 'delete'
 })
+
+// 参数列表
+export const reqParamsList = ({cateId, sel}) => request({
+  url: `categories/${cateId}/attributes`,
+  method: 'get',
+  params: {
+    sel
+  }
+})
