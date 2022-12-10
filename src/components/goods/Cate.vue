@@ -298,7 +298,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .el-icon-error {
   color: $theme-r;
 }
