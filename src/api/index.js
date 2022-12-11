@@ -158,3 +158,17 @@ export const reqParamsList = ({cateId, sel}) => request({
     sel
   }
 })
+
+// 添加动态参数或者静态属性
+export const reqAddAttr = addInfo => {
+  const { cateId, attr_name, attr_sel, attr_vals } = addInfo
+  return request({
+    url: `categories/${ cateId }/attributes`,
+    method: 'post',
+    data: {
+      attr_name,
+      attr_sel,
+      attr_vals
+    }
+  })
+}
