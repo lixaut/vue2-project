@@ -44,7 +44,42 @@
           >
           <!-- 参数数据表格 -->
           <el-table :data="manyList">
-            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="expand">
+              <!-- 表格展开属性 -->
+              <template slot-scope="{ row }">
+                <el-row>
+                  <el-col>
+                    <!-- 属性标签 -->
+                    <el-tag
+                      v-for="item in row.attr_vals"
+                      :key="item"
+                      closable
+                      size="small"
+                      disable-transitions
+                      @close="handleClose(row, item)"
+                      >{{ item }}</el-tag
+                    >
+                    <!-- 属性输入框 -->
+                    <el-input
+                      ref="saveTagInput"
+                      class="input-new-tag"
+                      v-if="row.inputVisible"
+                      v-model="inputValue"
+                      @keyup.native.enter="handleInputConfirm(row)"
+                      @blur="handleInputConfirm(row)"
+                    ></el-input>
+                    <!-- 添加属性按钮 -->
+                    <el-button
+                      v-else
+                      class="button-new-tag"
+                      size="small"
+                      @click="showInput(row)"
+                      >+ New Tag</el-button
+                    >
+                  </el-col>
+                </el-row>
+              </template>
+            </el-table-column>
             <el-table-column type="index"></el-table-column>
             <el-table-column
               label="参数名称"
@@ -74,7 +109,42 @@
           >
           <!-- 属性数据表格 -->
           <el-table :data="onlyList">
-            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="expand">
+              <!-- 表格展开属性 -->
+              <template slot-scope="{ row }">
+                <el-row>
+                  <el-col>
+                    <!-- 属性标签 -->
+                    <el-tag
+                      v-for="item in row.attr_vals"
+                      :key="item"
+                      closable
+                      size="small"
+                      disable-transitions
+                      @close="handleClose(row, item)"
+                      >{{ item }}</el-tag
+                    >
+                    <!-- 属性输入框 -->
+                    <el-input
+                      ref="saveTagInput"
+                      class="input-new-tag"
+                      v-if="row.inputVisible"
+                      v-model="inputValue"
+                      @keyup.native.enter="handleInputConfirm(row)"
+                      @blur="handleInputConfirm(row)"
+                    ></el-input>
+                    <!-- 添加属性按钮 -->
+                    <el-button
+                      v-else
+                      class="button-new-tag"
+                      size="small"
+                      @click="showInput(row)"
+                      >+ New Tag</el-button
+                    >
+                  </el-col>
+                </el-row>
+              </template>
+            </el-table-column>
             <el-table-column type="index"></el-table-column>
             <el-table-column
               label="属性名称"
@@ -158,6 +228,8 @@ export default {
           { required: true, validator: checkAttrName, trigger: "blur" },
         ],
       },
+      // 添加标签属性的值
+      inputValue: "",
     };
   },
   created() {
@@ -208,9 +280,19 @@ export default {
         return this.$message.error(`获取${str}失败！`);
       }
       if (this.activeName === "many") {
-        this.manyList = res.data;
+        this.manyList = res.data.map((item) => {
+          item.attr_vals =
+            item.attr_vals.length === 0 ? [] : item.attr_vals.split(",");
+          item.inputVisible = false;
+          return item;
+        });
       } else {
-        this.onlyList = res.data;
+        this.onlyList = res.data.map((item) => {
+          item.attr_vals =
+            item.attr_vals.length === 0 ? [] : item.attr_vals.split(",");
+          item.inputVisible = false;
+          return item;
+        });
       }
     },
     // 页签点击事件
@@ -223,29 +305,75 @@ export default {
     },
     // 添加对话框确定按钮
     addDialogSubmit() {
-      this.$refs.addFormRef.validate(async valid => {
-        if (!valid) return
+      this.$refs.addFormRef.validate(async (valid) => {
+        if (!valid) return;
         const addInfo = {
           attr_name: this.addForm.attrName,
           attr_sel: this.activeName,
-          cateId: this.cascaderValue[2]
-        }
-        const { data: res } = await this.$http.reqAddAttr(addInfo)
+          cateId: this.cascaderValue[2],
+        };
+        const { data: res } = await this.$http.reqAddAttr(addInfo);
         if (res.meta.status !== 201) {
-          return this.$message.error(`添加${this.manyOrOnly}失败！`)
+          return this.$message.error(`添加${this.manyOrOnly}失败！`);
         }
-        this.$message.success(`添加${this.manyOrOnly}成功！`)
-        if (this.activeName === 'many') {
-          this.manyList.push(res.data)
+        this.$message.success(`添加${this.manyOrOnly}成功！`);
+        if (this.activeName === "many") {
+          this.manyList.push(res.data);
         } else {
-          this.onlyList.push(res.data)
+          this.onlyList.push(res.data);
         }
-        this.addDialogVisible = false
-      })
+        this.addDialogVisible = false;
+      });
     },
     // 添加对话框关闭回调
     addDialogClosed() {
       this.$refs.addFormRef.resetFields();
+    },
+    // 属性标签关闭
+    async handleClose(row, tag) {
+      row.attr_vals.splice(row.attr_vals.indexOf(tag), 1);
+      let attr_vals = row.attr_vals.join(",");
+      const editInfo = {
+        cateId: this.cascaderValue[2],
+        attrId: row.attr_id,
+        attr_name: row.attr_name,
+        attr_sel: this.activeName,
+        attr_vals,
+      };
+      const { data: res } = await this.$http.reqEditParams(editInfo);
+      if (res.meta.status !== 200) {
+        return this.$message.error("属性值删除失败!");
+      }
+      this.$message.success("属性值删除成功!");
+    },
+    // 展示input
+    showInput(row) {
+      row.inputVisible = true;
+      this.$nextTick((_) => {
+        this.$refs.saveTagInput.focus();
+      });
+    },
+    // 输入框确定
+    async handleInputConfirm(row) {
+      let inputValue = this.inputValue;
+      if (inputValue) {
+        row.attr_vals.push(inputValue);
+        let attr_vals = row.attr_vals.join(",");
+        const editInfo = {
+          cateId: this.cascaderValue[2],
+          attrId: row.attr_id,
+          attr_name: row.attr_name,
+          attr_sel: this.activeName,
+          attr_vals,
+        };
+        const { data: res } = await this.$http.reqEditParams(editInfo);
+        if (res.meta.status !== 200) {
+          return this.$message.error("属性值添加失败!");
+        }
+        this.$message.success("属性值添加成功!");
+      }
+      row.inputVisible = false;
+      this.inputValue = "";
     },
   },
 };
@@ -254,5 +382,20 @@ export default {
 <style lang='scss' scoped>
 .selectCate {
   margin: 20px 0;
+}
+.el-tag {
+  margin: 5px;
+}
+.button-new-tag {
+  margin-left: 10px;
+  height: 24px;
+  line-height: 24px;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-radius: 4px;
+}
+.input-new-tag {
+  width: 120px;
+  margin-left: 10px;
 }
 </style>
