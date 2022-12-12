@@ -86,11 +86,11 @@
               prop="attr_name"
             ></el-table-column>
             <el-table-column label="操作" align="center">
-              <template>
-                <el-button size="mini" type="success" icon="el-icon-edit"
+              <template slot-scope="{row}">
+                <el-button size="mini" type="success" icon="el-icon-edit" @click="editBtn(row)"
                   >编辑</el-button
                 >
-                <el-button size="mini" type="danger" icon="el-icon-delete"
+                <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteBtn(row)"
                   >删除</el-button
                 >
               </template>
@@ -151,11 +151,11 @@
               prop="attr_name"
             ></el-table-column>
             <el-table-column label="操作" align="center">
-              <template>
-                <el-button size="mini" type="success" icon="el-icon-edit"
+              <template slot-scope="{row}">
+                <el-button size="mini" type="success" icon="el-icon-edit" @click="editBtn(row)"
                   >编辑</el-button
                 >
-                <el-button size="mini" type="danger" icon="el-icon-delete"
+                <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteBtn(row)"
                   >删除</el-button
                 >
               </template>
@@ -167,7 +167,7 @@
 
     <!-- 添加参数对话框 -->
     <el-dialog
-      :title="'添加' + manyOrOnly"
+      :title="btnAction + manyOrOnly"
       :visible.sync="addDialogVisible"
       @close="addDialogClosed"
     >
@@ -188,6 +188,7 @@
         <el-button type="primary" @click="addDialogSubmit">确 定</el-button>
       </div>
     </el-dialog>
+
   </div>
 </template>
 
@@ -222,6 +223,7 @@ export default {
       // 添加参数或属性表单
       addForm: {
         attrName: "",
+        attrId: ''
       },
       addFormRules: {
         attrName: [
@@ -230,6 +232,8 @@ export default {
       },
       // 添加标签属性的值
       inputValue: "",
+      // 添加｜编辑 按钮
+      btnAction: ''
     };
   },
   created() {
@@ -301,6 +305,7 @@ export default {
     },
     // 添加参数 ｜ 添加属性 按钮
     addBtn() {
+      this.btnAction = '添加'
       this.addDialogVisible = true;
     },
     // 添加对话框确定按钮
@@ -310,23 +315,28 @@ export default {
         const addInfo = {
           attr_name: this.addForm.attrName,
           attr_sel: this.activeName,
-          cateId: this.cascaderValue[2],
+          cateId: this.cascaderValue[2]
         };
-        const { data: res } = await this.$http.reqAddAttr(addInfo);
-        if (res.meta.status !== 201) {
-          return this.$message.error(`添加${this.manyOrOnly}失败！`);
+        if (this.btnAction === '编辑') { 
+          addInfo.attrId = this.addForm.attrId
         }
-        this.$message.success(`添加${this.manyOrOnly}成功！`);
-        if (this.activeName === "many") {
-          this.manyList.push(res.data);
-        } else {
-          this.onlyList.push(res.data);
+        const { data: res } = await (
+          this.btnAction === '添加' ?
+          this.$http.reqAddAttr(addInfo) : 
+          this.$http.reqEditAttr(addInfo)
+        )
+        if (res.meta.status !== 201 && res.meta.status !== 200) {
+          return this.$message.error(`${this.btnAction + this.manyOrOnly}失败！`);
         }
+        this.$message.success(`${this.btnAction + this.manyOrOnly}成功！`);
+        this.cascaderChanged()
         this.addDialogVisible = false;
       });
     },
     // 添加对话框关闭回调
     addDialogClosed() {
+      this.btnAction = ''
+      this.addForm.attrId = ''
       this.$refs.addFormRef.resetFields();
     },
     // 属性标签关闭
@@ -375,6 +385,37 @@ export default {
       row.inputVisible = false;
       this.inputValue = "";
     },
+    // 编辑参数｜属性按钮
+    editBtn(row) {
+      this.btnAction = '编辑'
+      this.addForm.attrId = row.attr_id
+      this.addForm.attrName = row.attr_name
+      this.addDialogVisible = true
+    },
+    // 删除参数｜属性按钮
+    async deleteBtn(row) {
+      const deleteResult = await this.$msgbox({
+        title: '提示',
+        message: `此操作将永久删除该${this.manyOrOnly}，确定要继续吗？`,
+        type: 'warning',
+        showCancelButton: true,
+        showConfirmButton: true,
+        showClose: false,
+      }).catch(error => new Error(error))
+      if (deleteResult === 'confirm') {
+        const deleteInfo = {
+          cateId: this.cascaderValue[2],
+          attrId: row.attr_id
+        }
+        const { data: res } = await this.$http.reqDeleteAttr(deleteInfo)
+        if (res.meta.status !== 200) {
+          return this.$message.error(`删除${this.manyOrOnly}失败！`)
+        }
+        this.cascaderChanged()
+        return this.$message.success(`删除${this.manyOrOnly}成功！`)
+      }
+      this.$message.info(`删除${this.manyOrOnly}操作已取消`)
+    }
   },
 };
 </script>

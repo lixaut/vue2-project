@@ -174,15 +174,23 @@ export const reqAddAttr = addInfo => {
 }
 
 // 编辑提交参数
-export const reqEditParams = editInfo => {
-  const { cateId, attrId, attr_name, attr_sel, attr_vals } = editInfo
+export const reqEditAttr = editInfo => {
+  const { cateId, attrId, attr_name, attr_sel } = editInfo
   return request({
     url: `categories/${cateId}/attributes/${attrId}`,
     method: 'put',
     data: {
       attr_name,
-      attr_sel,
-      attr_vals
+      attr_sel
     }
+  })
+}
+
+// 删除参数
+export const reqDeleteAttr = deleteInfo => {
+  const { cateId, attrId } = deleteInfo
+  return request({
+    url: `categories/${cateId}/attributes/${attrId}`,
+    method: 'delete'
   })
 }
