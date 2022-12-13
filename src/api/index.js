@@ -195,3 +195,10 @@ export const reqDeleteAttr = deleteInfo => {
     method: 'delete'
   })
 }
+
+// 商品列表数据
+export const reqGetGoodsList = params => request({
+  url: 'goods',
+  method: 'get',
+  params
+})

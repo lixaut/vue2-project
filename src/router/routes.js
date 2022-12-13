@@ -36,6 +36,10 @@ export default {
         {
           path: 'params',
           component: () => import('@/components/goods/Params.vue')
+        },
+        {
+          path: 'goods',
+          component: () => import('@/components/goods/List.vue')
         }
       ],
       redirect: '/home/welcome'
