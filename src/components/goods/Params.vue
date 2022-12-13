@@ -350,7 +350,7 @@ export default {
         attr_sel: this.activeName,
         attr_vals,
       };
-      const { data: res } = await this.$http.reqEditParams(editInfo);
+      const { data: res } = await this.$http.reqEditAttr(editInfo);
       if (res.meta.status !== 200) {
         return this.$message.error("属性值删除失败!");
       }
@@ -376,7 +376,7 @@ export default {
           attr_sel: this.activeName,
           attr_vals,
         };
-        const { data: res } = await this.$http.reqEditParams(editInfo);
+        const { data: res } = await this.$http.reqEditAttr(editInfo);
         if (res.meta.status !== 200) {
           return this.$message.error("属性值添加失败!");
         }

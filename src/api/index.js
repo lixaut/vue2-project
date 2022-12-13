@@ -175,13 +175,14 @@ export const reqAddAttr = addInfo => {
 
 // 编辑提交参数
 export const reqEditAttr = editInfo => {
-  const { cateId, attrId, attr_name, attr_sel } = editInfo
+  const { cateId, attrId, attr_name, attr_sel, attr_vals } = editInfo
   return request({
     url: `categories/${cateId}/attributes/${attrId}`,
     method: 'put',
     data: {
       attr_name,
-      attr_sel
+      attr_sel,
+      attr_vals
     }
   })
 }
