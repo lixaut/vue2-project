@@ -9,12 +9,20 @@
 
     <!-- 卡片视图区 -->
     <el-card>
-      
       <!-- 头部功能区 -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入内容" v-model="searchInputValue">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input
+            placeholder="请输入内容"
+            v-model="getGoodsParams.query"
+            clearable
+            @clear="handleSearchClear"
+          >
+            <el-button
+              slot="append"
+              icon="el-icon-search"
+              @click="searchGoods"
+            ></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -36,14 +44,13 @@
           align="center"
           label="商品重量"
           prop="goods_weight"
-          width="80"
+          width="110"
         ></el-table-column>
-        <el-table-column
-          align="center"
-          label="创建时间"
-          prop="add_time"
-          width="100"
-        ></el-table-column>
+        <el-table-column align="center" label="创建时间" width="100">
+          <template slot-scope="{ row }">
+            {{ row.add_time | dateFormat }}
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="操作" width="140">
           <el-button size="mini" icon="el-icon-edit" type="success"></el-button>
           <el-button
@@ -61,7 +68,7 @@
         :current-page="getGoodsParams.pagenum"
         :page-size="5"
         :page-sizes="[5, 10, 15, 20]"
-        layout="prev, pager, next, ->, sizes, total"
+        layout="jumper, prev, pager, next, ->, sizes, total"
         :total="total"
       >
         ></el-pagination
@@ -71,19 +78,25 @@
 </template>
 
 <script>
+import moment from "moment";
 export default {
   name: "List",
   data() {
     return {
-      searchInputValue: "",
       getGoodsParams: {
         query: "",
         pagenum: 1,
         pagesize: 5,
       },
       goodsList: [],
-      total: 0
+      total: 0,
     };
+  },
+  filters: {
+    dateFormat(time) {
+      if (!time) return "";
+      return moment(time).format("YYYY-MM-DD HH:mm:ss");
+    },
   },
   created() {
     this.getGoodsList();
@@ -101,13 +114,21 @@ export default {
     },
     // 每页展示数量变化回调
     handleSizeChange(pageSize) {
-      this.getGoodsParams.pagesize = pageSize
-      this.getGoodsList()
+      this.getGoodsParams.pagesize = pageSize;
+      this.getGoodsList();
     },
     // 当前页改变回调
     handleCurrentChange(currentPage) {
-      this.getGoodsParams.pagenum = currentPage
-      this.getGoodsList() 
+      this.getGoodsParams.pagenum = currentPage;
+      this.getGoodsList();
+    },
+    // 查询商品
+    searchGoods() {
+      this.getGoodsList();
+    },
+    // 搜索商品输入框清除
+    handleSearchClear() {
+      this.getGoodsList()
     }
   },
 };
@@ -116,5 +137,6 @@ export default {
 <style lang="scss" scoped>
 .el-table {
   margin: 20px 0;
+  font-size: 12px;
 }
 </style>
