@@ -40,6 +40,10 @@ export default {
         {
           path: 'goods',
           component: () => import('@/components/goods/List.vue')
+        },
+        {
+          path: 'goods/addgoods',
+          component: () => import('@/components/goods/AddGoods.vue')
         }
       ],
       redirect: '/home/welcome'
