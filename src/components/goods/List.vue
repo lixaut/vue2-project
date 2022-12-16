@@ -26,7 +26,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">添加商品</el-button>
+          <el-button type="primary" @click="addGoodsBtn">添加商品</el-button>
         </el-col>
       </el-row>
 
@@ -129,6 +129,10 @@ export default {
     // 搜索商品输入框清除
     handleSearchClear() {
       this.getGoodsList()
+    },
+    // 添加商品按钮
+    addGoodsBtn() {
+      this.$router.push('/home/goods/addgoods')
     }
   },
 };
