@@ -202,3 +202,10 @@ export const reqGetGoodsList = params => request({
   method: 'get',
   params
 })
+
+// 添加商品
+export const reqAddGoods = data => request({
+  url: 'goods',
+  method: 'post',
+  data
+})
